@@ -1,0 +1,32 @@
+{%extends 'base.html' %}
+{%block body_block%}
+
+<h1 class="text-center">Categories</h1>
+<div class="container">
+    <div class="row mt-5">
+        {% if catprods %}
+    
+{% for scrap in catprods %}
+<div class="col-4 mt-3 mb-5">
+    <div class="card w-50 ">
+        <div class="card-body ">
+            
+          <h5 class="card-title">{{scrap.category}}</h5>
+         
+          <p class="card-text">we provide a collection of  take a look</p>
+          <a href="" class="btn btn-primary">Explore</a>
+        </div>
+      </div>
+</div>
+        
+          {% endfor %}
+{% else %}
+    <p>No products available</p>
+{% endif %}
+
+    </div>
+    
+
+</div>
+{%endblock%}
+

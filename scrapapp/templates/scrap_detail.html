@@ -1,0 +1,85 @@
+{%extends 'base.html'%}
+{%block body_block%}
+
+
+
+<div class="container d-flex justify-content-center mt-5">
+  
+  <div class="col-md-6">
+    <h2 class=" text-danger mt-3 mb-3">details </h2>
+    <div class="card bg-success " style="width: 18rem;">
+      {%if data.image%}
+      <img src="{{data.image.url}}" alt="" height="300px">
+      {%endif%}
+        <div class="card-header">
+         Name: {{data.name}}
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">Category:{{data.category}}</li>
+          <li class="list-group-item">Location:{{data.location}}</li>
+          <li class="list-group-item">Price:{{data.price}}</li>
+        </ul>
+      </div>
+     
+    </div>
+
+    <div class="col-md-6">
+      <style>
+        /* Style for the review container */
+        .review-container {
+            background-color: #f8f8f8;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    
+        /* Style for the review comment */
+        .review-comment {
+            margin: 0;
+        }
+       .text{
+        color: black;
+       }
+    </style>
+    <button class="btn btn-secondary "><a href="{%url 'review' data.id%}" class="text-decoration-none text">Add reviews</a></button>
+
+    <!-- Display reviews using the defined styles -->
+    {% for review in data.scrap_review.all %}
+
+        <div class="review-container mt-5">
+          <h4 class="text-secondary">{{review.user}}</h4>
+            <p class="review-comment">Review:{{ review.comment }}</p>
+            <p class="review-rating">Rating:{{ review.rating }}</p>
+            
+           
+            
+        </div>
+    {% endfor %}
+    
+    </div>
+      <!--  -->
+      <!-- <div class="col-md-6">
+        <h2 class=" text-danger mt-3 mb-3">Feautures </h2>
+      <div class="card bg-success " style="width: 18rem;">
+        {%if data.image%}
+        <img src="{{data.image.url}}" alt="" height="300px">
+        {%endif%}
+          <div class="card-header">
+           Name: {{data.name}}
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">User:{{data.user}}</li>
+            <li class="list-group-item">Condition:{{info.condition}}</li>
+            <li class="list-group-item">Price:{{data.price}}</li>
+            <li class="list-group-item">Created date:{{info.created_date}}</li>
+            
+          </ul>
+
+        </div>
+        </div> -->
+       
+
+</div>
+
+{%endblock%}

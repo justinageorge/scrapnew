@@ -1,0 +1,13 @@
+{%extends 'base.html'%}
+{%block body_block%}
+<div class="container d-flex justify-content-center mt-5">
+    
+    <form for="" method="post" enctype="multipart/form-data" class="w-50 border  shadow p-5">
+        <h4 class="text-center mb-5 fw-bolder">add a new item</h4>
+        {%csrf_token%}
+        {{form.as_p}}
+        <button type="submit" class="btn btn-success">add</button>
+    </form>
+</div>
+
+{%endblock%}
