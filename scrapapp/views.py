@@ -135,7 +135,7 @@ class SignOutView(View):
         logout(request)
         return redirect("signin")
     
-
+@method_decorator(signin_required,name="dispatch")
 class CategoryView(View):
     template_name="category_list.html"
     def get(self,request,*args,**kwargs):
@@ -147,7 +147,7 @@ class CategoryView(View):
         context={'catprods':catprods}  
        
         return render(request,"category_list.html",context)
-    
+@method_decorator(signin_required,name="dispatch")   
 class filterView(View):
     template_name="category_filter.html"
     def get(self,request,*args,**kwargs):
@@ -159,7 +159,7 @@ class filterView(View):
         
         return render(request,"category_filter.html",{"data1":category_items})  
     
-
+@method_decorator(signin_required,name="dispatch")
 class ScrapFeautureView(View):
     def get(self,request,*args,**kwargs):
         form=ScrapFeautureForm()
@@ -178,7 +178,7 @@ class ScrapFeautureView(View):
         else:
             messages.error(request,"failed to insert the feauture")
             return render(request,"feauture.html",{"form":form})
-
+@method_decorator(signin_required,name="dispatch")
 class ScrapFeautureViews(View):
     def get(self,request,*args,**kwargs):
          id=kwargs.get("pk")
@@ -186,7 +186,7 @@ class ScrapFeautureViews(View):
          print(qs)
          return render(request,"feauture_display.html",{"info":qs})
     
-
+@method_decorator(signin_required,name="dispatch")
 class ReviewView(View):
     def get(self,request,*args,**kwargs):
         id=kwargs.get("pk")
