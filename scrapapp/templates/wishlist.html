@@ -1,0 +1,50 @@
+<!-- wishlist.html -->
+
+{% extends 'base.html' %}
+{% block body_block %}
+<style>
+    .text-center{
+      color:dimgrey;
+       
+    }
+    .card{
+        min-height:500px;
+        
+    }
+    .count{
+        margin-left:80%;
+        font-size: large;
+    }
+    
+</style>
+<!-- wishlist.html -->
+<p class="count  text-danger">Total items in your cart: {{ wishlistcount }}</p>
+
+
+
+<div class="container mt-5">
+ <h1 class="text-center mb-5">WishList</h1>
+ {%if wishlist%}
+ <div class="row mt-3">
+    {%for item in wishlist%}
+    <div class="col-3 mb-4">
+    <div class="card">
+        <img src="{{item.image.url}}" class="card-img-top" alt=""  height="250px">
+        <div class="card-body">
+            <h5 class="card-title">{{item.name}}</h5>
+            <p class="card-text">Category:{{item.category}}</p>
+            <p class="card-text">Price: ${{ item.price }}</p>
+
+            <a href="{%url 'remove' item.id%}" class="btn btn-danger">remove from wishlist</a>
+            <a href="{%url 'buy' scrap_id=item.id %}" class="btn btn-danger">buy now</a>
+
+        </div>
+    </div>
+    
+    </div>
+    {%endfor%}
+ </div>
+ {%endif%}
+</div>
+  
+{% endblock %}

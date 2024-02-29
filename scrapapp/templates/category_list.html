@@ -1,34 +1,56 @@
 {%extends 'base.html' %}
 {%block body_block%}
-
-<h1 class="text-center">Categories</h1>
-<div class="container">
-    <div class="row mt-5">
-        {% if catprods %}
-    
-{% for scrap in catprods %}
-<div class="col-4 mt-3 mb-5">
-    <div class="card w-50 ">
-        <div class="card-body ">
-            
-          <h5 class="card-title">{{scrap.category}}</h5>
-         
-          <p class="card-text">we provide a collection of  take a look</p>
-        
-          <a href="" class="btn btn-primary">Explore</a>
-         
-        </div>
-      </div>
+<style>
+    .heading{
+        color:black;
+        background-color:gray;
+        text-align: center;
+        margin-top: 3rem;
+        padding:0.5rem;
+        width:50%;
+        margin-left: 25%;
+    }
+    .container11{
+        max-width: 800px;
+        margin:20px auto;
+        padding:20px;
+        background-color:aliceblue;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    ul{
+        list-style-type: none;
+        padding:0;
+    }
+    li{
+        margin-bottom: 10px;
+        background-color: #ddd;
+        padding:10px;
+        border-radius: 5px;
+    }
+    a{
+        text-decoration: none;
+        color:black;
+        font-weight: bold;
+    }
+    a:hover {
+            color: #1e90ff;
+        }
+</style>
+<h2 class="heading">Category list</h2>
+<div class="container11">
+    <ul>
+        {%for category in categories%}
+        {%if category%}
+        <li>
+            <a href="{%url 'filter' pk=category.id%}">{{category.name}}</a>
+        </li>
+        {%else%}
+        <p>No items left</p>
+        {%endif%}
+        {%endfor%}
+    </ul>
 </div>
-        
-          {% endfor %}
-{% else %}
-    <p>No products available</p>
-{% endif %}
 
-    </div>
-    
-
-</div>
 {%endblock%}
 

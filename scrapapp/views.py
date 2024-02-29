@@ -1,11 +1,13 @@
 from django.shortcuts import render,redirect
 from django.views.generic import View
-from scrapapp.models  import Scraps,Category, ScrapsFeauture
+from scrapapp.models  import Scraps,Category, ScrapsFeauture,WishList,Order,OrderItem
 from scrapapp.forms import  ScrapForm,RegistraionForm,LoginForm,ScrapFeautureForm  ,ReviewForm
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib .auth import authenticate,login,logout
 from django.utils.decorators import method_decorator
+from collections import defaultdict
+
 
 
 
@@ -135,18 +137,16 @@ class SignOutView(View):
         logout(request)
         return redirect("signin")
     
-@method_decorator(signin_required,name="dispatch")
-class CategoryView(View):
-    template_name="category_list.html"
-    def get(self,request,*args,**kwargs):
-        allprods=[]
-        catprods=Scraps.objects.values('category').distinct()
-        
-        cats={item['category'] for item in catprods}
-        
-        context={'catprods':catprods}  
-       
-        return render(request,"category_list.html",context)
+
+
+def category_list_view(request):
+    categories=Category.objects.all()
+    context={
+        "categories":categories
+    }
+    return render(request,"category_list.html",context)
+
+
 @method_decorator(signin_required,name="dispatch")   
 class filterView(View):
     template_name="category_filter.html"
@@ -210,4 +210,103 @@ class ReviewView(View):
             return redirect("scrap-detail", pk=scrap_object.pk)
         return render(request,"scrap_detail.html",{"data":scrap_object,"form":form})
             
+
+def add_to_wishlist(request,scrap_id):
+    scrap_obj=Scraps.objects.get(id=scrap_id)
+    wishlist,created=WishList.objects.get_or_create(user=request.user)
+    wishlist.scrap.add(scrap_obj)
+    return redirect('wishview')
+
+def remove_wishlist(request,scrap_id):
+    scrap_obj=Scraps.objects.get(id=scrap_id)
+    wishlist,created=WishList.objects.get_or_create(user=request.user)
+    wishlist.scrap.remove(scrap_obj)
+    return redirect("wishview")
+
+def wishlistView(request):
+     wishlist,created=WishList.objects.get_or_create(user=request.user)
+     wishlist_items=wishlist.scrap.all()
+     count=wishlist_items.count()
+     return render(request,"wishlist.html",{"wishlist":wishlist_items,"wishlistcount":count})
+def buy_now(request,scrap_id):
+    scrap=Scraps.objects.get(pk=scrap_id)
+    existing=OrderItem.objects.filter(order__user=request.user,scrap=scrap).first()
+    if existing:
+        existing.quantity+=1
+        existing.save()
+    order,created=Order.objects.get_or_create(user=request.user,total_price=0)
+    order_item,created=OrderItem.objects.get_or_create(order=order,scrap=scrap,defaults={'price':scrap.price})
+    if not created:
+        order_item.quantity+=1
+        order_item.save()
+
+
+    order.total_price+=scrap.price
+    order.save()
+    return redirect('checkout')
+
+def remove_buynow(request, scrap_id):
+    scrap_obj=Scraps.objects.get(pk=scrap_id)
+    order,created=Order.objects.get_or_create(user=request.user,total_price=0)
+    if not created:
+        order_item=OrderItem.objects.filter(order=order,scrap=scrap_obj)
+        print(order_item)
+        if order_item:
+            order_item.price=0
+            order_item.delete()
+            order.save()
+        return redirect('checkout')
+
+# def checkout(request):
+#     orders = Order.objects.filter(user=request.user, total_price__gt=0)
+    
+#     for current_order in orders:
+#         order_items = OrderItem.objects.filter(order=current_order)
+#         existing = {item.scrap.id: item for item in order_items}
+        
+        
+#         for order_item in order_items:
+#             if order_item.scrap.id in existing:
+#                 existing_item = existing[order_item.scrap.id]
+                
+#                 existing_item.quantity += 1
+#                 order_items.remove(existing_item)
+#                 existing_item.save()
+#                 print(existing_item)
+#             else:
+#                 print("nothing")    
+
+#     order_items = OrderItem.objects.filter(order__in=orders.values('id'))
+#     return render(request, "checkout.html", {"orders": orders, "order_items": order_items})
+
+
+def checkout(request):
+    orders = Order.objects.filter(user=request.user, total_price__gt=0)
+
+    for current_order in orders:
+        order_items = OrderItem.objects.filter(order=current_order)
+        existing_items = {}
+
+        for order_item in order_items:
+            scrap_id = order_item.scrap.id
+
+            if scrap_id in existing_items:
+                existing_items[scrap_id].quantity += 1
+                order_item.delete()  # Remove the duplicate item
+            else:
+                existing_items[scrap_id] = order_item
+
+        # Update the existing items
+        for existing_item in existing_items.values():
+            existing_item.save()
+       
+    order_items = OrderItem.objects.filter(order__in=orders.values('id'))
+    
+    total_price = 0
+
+    for item in order_items:
+        total_price += item.scrap.price * item.quantity
+
+    return render(request, "checkout.html", {"orders": orders, "order_items": order_items, "total_price": total_price})
+
 

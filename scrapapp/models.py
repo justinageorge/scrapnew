@@ -45,8 +45,8 @@ class ScrapsFeauture(models.Model):
 
 class WishList(models.Model):
     scrap=models.ManyToManyField(Scraps,related_name="wish")   
-    user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="scrap_wish") 
-    created_date=models.DateField()
+    user=models.OneToOneField(User,on_delete=models.CASCADE,related_name="scrap_wish") 
+    
     
 
 class Bids(models.Model):
@@ -78,4 +78,16 @@ class Reviews(models.Model):
         if created:
             UserProfile.objects.create(user=instance)
     post_save.connect(create_profile,sender=User)            
+
+
+class Order(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    created_at=models.DateTimeField(auto_now_add=True)
+    total_price=models.PositiveIntegerField(default=0)
+
+class OrderItem(models.Model):
+    order=models.ForeignKey(Order,on_delete=models.CASCADE,related_name="orderitem")
+    scrap=models.ForeignKey(Scraps,on_delete=models.CASCADE)
+    quantity=models.PositiveIntegerField(default=1)
+    price=models.PositiveIntegerField()
 
